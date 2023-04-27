@@ -8,5 +8,6 @@ class Addjob(FlaskForm):
     team_leader = IntegerField('Team leader id', validators=[DataRequired()])
     work_size = IntegerField('Work size', validators=[DataRequired()])
     collaborators = StringField('Collaborators', validators=[DataRequired()])
+    hazard_category = IntegerField('hazard category', validators=[DataRequired()])
     is_finished = BooleanField('Is job finished?')
     submit = SubmitField('Submit')

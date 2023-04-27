@@ -8,6 +8,7 @@ from forms.user import RegisterForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from forms.login_form import LoginForm
 from forms.job_form import Addjob
+from intermediate_table import Jobs_intermediate
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -20,12 +21,12 @@ def create_spisok():
     db_sess = db_session.create_session()
 
     jobs = []
-    for job in db_sess.query(Jobs).all():
+    for job in db_sess.query(Jobs_intermediate).all():
         if job.is_finished:
             finish = 'is finished'
         else:
             finish = 'is not finished'
-        jobs.append([job.id, job.job, job.team_leader, job.work_size, job.collaborators, finish, job.creates_user_id])
+        jobs.append([job.id, job.job, job.team_leader, job.work_size, job.collaborators, finish, job.creates_user_id, job.hazard_category])
     return jobs
 
 
@@ -108,7 +109,20 @@ def addjob():
             is_finished=form.is_finished.data,
             start_date=datetime.datetime.now(),
             creates_user_id=current_user.id
+
         )
+        intermediate_table = Jobs_intermediate(
+            team_leader=form.team_leader.data,
+            job=form.job.data,
+            work_size=form.work_size.data,
+            collaborators=form.collaborators.data,
+            is_finished=form.is_finished.data,
+            start_date=datetime.datetime.now(),
+            creates_user_id=current_user.id,
+            hazard_category=form.hazard_category.data
+        )
+        db_sess.add(intermediate_table)
+        db_sess.commit()
         db_sess.add(job)
         db_sess.commit()
         return redirect('/')
